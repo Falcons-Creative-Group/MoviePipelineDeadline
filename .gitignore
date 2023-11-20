@@ -1,0 +1,11 @@
+# Ignore build folders
+Binaries/
+Intermediate/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Editors
+.idea
+.vscode
