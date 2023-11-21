@@ -104,7 +104,7 @@ def render_current_sequence(
     render_job.map = map_data_asset.to_soft_object_path()
 
     mrq_preset_data_asset = get_asset_data(
-        mrq_preset, "MoviePipelineMasterConfig"
+        mrq_preset, "MoviePipelinePrimaryConfig"
     )
     unreal.log(
         f"Setting the movie pipeline preset to `{mrq_preset_data_asset.asset_name}`"
