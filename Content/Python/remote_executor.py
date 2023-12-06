@@ -340,7 +340,16 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
 
         # This triggers the editor to start looking for render jobs when it
         # finishes loading.
-        out_exec_cmds.append("py mrq_rpc.py")
+        # NOTE: Previously, it was forcing to appending mrq_cli.py to the command.
+        # With the new implementation, we will use the `CommandLineMode` to determine.
+        command_line_mode_string_value = plugin_info.get("CommandLineMode", "true")
+        command_line_mode = eval(command_line_mode_string_value.capitalize())
+        if command_line_mode:
+            # Use mrq_cli.py to run in commandline mode
+            mrq_cli_cmd = self._generate_mrq_cli_cmd(new_job)
+            out_exec_cmds.append(mrq_cli_cmd)
+        else:
+            out_exec_cmds.append("py mrq_rpc.py")
 
         # Convert the arrays of command line args, device profile cvars,
         # and exec cmds into actual commands for our command line.
@@ -464,7 +473,7 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
         plugin_info.update(
             {
                 "CommandLineArguments": full_cmd_args,
-                "CommandLineMode": "false",
+                "CommandLineMode": command_line_mode_string_value,
             }
         )
 
@@ -473,6 +482,38 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
 
         # Submit the deadline job
         return deadline_service.submit_job(deadline_job)
+
+    def _generate_mrq_cli_cmd(self, job):
+        """
+        Generate the MRQ CLI command
+
+        :param job: MoviePipelineJob
+        :returns: MRQ CLI command
+        :rtype: str
+        """
+        ptrn = r"(\w+)$"
+        sequence_path = job.sequence.export_text()
+        matched = re.search(ptrn, sequence_path)
+        if matched:
+            sequence_name = matched.group()
+        else:
+            raise Exception("Failed to extract sequence name from '{}'".format(sequence_path))
+
+        map_path = job.map.export_text()
+        matched = re.search(ptrn, map_path)
+        if matched:
+            map_name = matched.group()
+        else:
+            raise Exception("Failed to get extract name from '{}'".format(map_path))
+
+        preset_origin = job.get_preset_origin()
+        mrq_preset_name = preset_origin.get_name()
+
+        # Append `--cmdline` to the script args as this will tell the editor
+        # to shut down after a render is complete.
+        return "py mrq_cli.py sequence {} {} {} --cmdline".format(
+            sequence_name, map_name, mrq_preset_name
+        )
 
     # TODO: For performance reasons, we will skip updating the UI and request
     #  that users use a different mechanism for checking on job statuses.
