@@ -342,7 +342,7 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
         # finishes loading.
         # NOTE: Previously, it was forcing to appending mrq_cli.py to the command.
         # With the new implementation, we will use the `CommandLineMode` to determine.
-        command_line_mode_string_value = plugin_info.get("CommandLineMode", "true")
+        command_line_mode_string_value = plugin_info.get("CommandLineMode", "false")
         command_line_mode = eval(command_line_mode_string_value.capitalize())
         if command_line_mode:
             # Use mrq_cli.py to run in commandline mode
