@@ -504,7 +504,7 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
         if matched:
             map_name = matched.group()
         else:
-            raise Exception("Failed to get extract name from '{}'".format(map_path))
+            raise Exception("Failed to get extract map name from '{}'".format(map_path))
 
         preset_origin = job.get_preset_origin()
         mrq_preset_name = preset_origin.get_name()
