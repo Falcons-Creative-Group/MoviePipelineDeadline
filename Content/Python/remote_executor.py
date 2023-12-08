@@ -491,6 +491,11 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
         :returns: MRQ CLI command
         :rtype: str
         """
+        # There's no native function to get sequence name from the sequence object.
+        # Here is the workaround:
+        # sequence.export_text() returns a path like: `/Game/Sequences/Sequence.MySequence`.
+        # Use regex to extract the last word after the last non-word character such as
+        # `/`, `.`, etc. to get the sequence name.
         ptrn = r"(\w+)$"
         sequence_path = job.sequence.export_text()
         matched = re.search(ptrn, sequence_path)
@@ -499,6 +504,11 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
         else:
             raise Exception("Failed to extract sequence name from '{}'".format(sequence_path))
 
+        # There's no native function to get map name from the map object.
+        # Here is the workaround:
+        # map.export_text() returns a path like: `/Game/Maps/Map.MyMap`.
+        # Use regex to extract the last word after the last non-word character such as
+        # `/`, `.`, etc. to get the map name.
         map_path = job.map.export_text()
         matched = re.search(ptrn, map_path)
         if matched:
