@@ -340,7 +340,7 @@ class MoviePipelineDeadlineRemoteExecutor(unreal.MoviePipelineExecutorBase):
 
         # This triggers the editor to start looking for render jobs when it
         # finishes loading.
-        # NOTE: Previously, it was forcing to appending mrq_cli.py to the command.
+        # NOTE: Previously, it was forcing to append mrq_rpc.py to the command.
         # With the new implementation, we will use the `CommandLineMode` to determine.
         command_line_mode_string_value = plugin_info.get("CommandLineMode", "false")
         command_line_mode = eval(command_line_mode_string_value.capitalize())
