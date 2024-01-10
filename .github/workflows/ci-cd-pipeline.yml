@@ -1,0 +1,21 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  is-prerelease:
+    name: Determine if this is a prerelease
+    uses: Falcons-Creative-Group/ci-cd-workflows/.github/workflows/prerelease-check.yml@main
+    with:
+        default-branch: 'main'
+
+  release:
+    name: Create (pre)release
+    needs: is-prerelease
+    uses: Falcons-Creative-Group/ci-cd-workflows/.github/workflows/release-to-github.yml@main
+    with:
+        is-prerelease: ${{ fromJSON(needs.is-prerelease.outputs.is-prerelease) }}
